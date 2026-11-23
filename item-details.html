@@ -1,0 +1,127 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Item Details | BatStateU Lost & Found</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="app">
+    <aside class="sidebar">
+        <a class="brand" href="feed.html" aria-label="BatStateU Lost and Found">⌕</a>
+        <nav class="nav">
+            <a href="user-dashboard.html">⌂<span>Dashboard</span></a>
+            <a href="feed.html" class="active">▦<span>Feed</span></a>
+            <a href="report-item.html">＋<span>Report</span></a>
+            <a href="my-listings.html">▤<span>My Listings</span></a>
+            <a href="notifications.html">♧<span>Alerts</span></a>
+            <a href="profile.html">⚙<span>Profile</span></a>
+        </nav>
+        <div class="sidebar-bottom">
+            <a href="index.html" title="Sign out">⇥</a>
+        </div>
+    </aside>
+
+    <main class="main">
+        <header class="topbar">
+            <label class="search">
+                <span>⌕</span>
+                <input type="search" placeholder="Search for an item..." aria-label="Search listings">
+            </label>
+            <div class="top-actions">
+                <a class="icon-btn" href="feed.html">▦</a>
+                <a class="icon-btn" href="notifications.html">♧</a>
+                <a class="avatar" href="profile.html">S</a>
+            </div>
+        </header>
+
+        <section class="content">
+            <div class="page-heading">
+                <div>
+                    <a class="back-link" href="feed.html">← Back to feed</a>
+                    <div class="eyebrow" style="margin-top:16px">Item information</div>
+                    <h1 id="detailName">Loading item...</h1>
+                    <p class="subtitle" id="detailId"></p>
+                </div>
+                <span id="detailStatus" class="status available" style="position:static">
+                    AVAILABLE
+                </span>
+            </div>
+
+            <div class="details-layout">
+                <section>
+                    <div id="mainPhoto" class="detail-main-image item-placeholder"
+                         style="font-size:100px">
+                        📦
+                    </div>
+                    <div id="thumbnailRow" class="thumb-row"></div>
+                </section>
+
+                <section class="panel">
+                    <div class="eyebrow" id="detailCategory">Category</div>
+                    <h2 id="detailHeading" style="font-size:24px;margin-top:8px"></h2>
+                    <p class="subtitle" id="detailDescription"></p>
+
+                    <hr style="border:0;border-top:1px solid var(--line);margin:22px 0">
+
+                    <div class="meta" id="detailDate"></div>
+                    <div class="meta" id="detailCampus"></div>
+                    <div class="meta" id="detailLocation"></div>
+                    <div class="meta" id="detailType"></div>
+
+                    <h3 style="margin-top:24px">Contact information</h3>
+                    <p class="subtitle" id="detailPoster"></p>
+
+                    <a id="contactReporter" class="btn btn-outline"
+                       style="margin-top:10px">
+                        ✉ Email the reporter
+                    </a>
+
+                    <div id="claimSection" style="margin-top:25px">
+                        <hr style="border:0;border-top:1px solid var(--line);margin-bottom:22px">
+
+                        <h3>Claim this item</h3>
+                        <p class="subtitle">
+                            Think this item belongs to you? Explain how you can identify it.
+                        </p>
+
+                        <form id="claimForm" style="margin-top:18px">
+                            <div class="form-group">
+                                <label for="claimName">Your name *</label>
+                                <input class="field" id="claimName" required>
+                            </div>
+
+                            <div class="form-group" style="margin-top:14px">
+                                <label for="claimEmail">Your email *</label>
+                                <input class="field" type="email" id="claimEmail" required>
+                            </div>
+
+                            <div class="form-group" style="margin-top:14px">
+                                <label for="claimReason">Why do you believe this item belongs to you? *</label>
+                                <textarea class="textarea" id="claimReason"
+                                    placeholder="Describe identifying details that are not already visible in the listing..."
+                                    required></textarea>
+                            </div>
+
+                            <div id="claimMessage" class="notice" hidden
+                                 style="margin-top:14px"></div>
+
+                            <button class="btn btn-primary" type="submit"
+                                    style="margin-top:16px">
+                                Submit claim request
+                            </button>
+                        </form>
+                    </div>
+
+                    <div id="ownerMessage" class="notice" hidden style="margin-top:20px"></div>
+                </section>
+            </div>
+        </section>
+    </main>
+</div>
+
+<script src="js/claims.js"></script>
+</body>
+</html>

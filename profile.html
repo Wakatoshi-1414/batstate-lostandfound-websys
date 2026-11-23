@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Profile | BatStateU Lost & Found</title>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <div class="app">
+      <aside class="sidebar">
+        <a class="brand" href="feed.html" aria-label="BatStateU Lost and Found"
+          >⌕</a
+        >
+        <nav class="nav">
+          <a href="user-dashboard.html" title="Dashboard"
+            >⌂<span>Dashboard</span></a
+          >
+          <a href="feed.html" title="Feed">▦<span>Feed</span></a>
+          <a href="report-item.html" title="Report item"
+            >＋<span>Report</span></a
+          >
+          <a href="my-listings.html" title="My listings"
+            >▤<span>My Listings</span></a
+          >
+          <a href="notifications.html" title="Notifications"
+            >♧<span>Alerts</span></a
+          >
+          <a href="profile.html" class="active" title="Profile"
+            >⚙<span>Profile</span></a
+          >
+        </nav>
+        <div class="sidebar-bottom">
+          <a href="index.html" title="Sign out">⇥</a>
+        </div>
+      </aside>
+      <main class="main">
+        <header class="topbar">
+          <label class="search"
+            ><span>⌕</span
+            ><input
+              type="search"
+              placeholder="Search for an item..."
+              aria-label="Search listings"
+          /></label>
+          <div class="top-actions">
+            <a class="icon-btn" href="feed.html" title="Browse">▦</a>
+            <a class="icon-btn" href="notifications.html" title="Notifications"
+              >♧</a
+            >
+            <a class="avatar" href="profile.html" title="Profile">S</a>
+          </div>
+        </header>
+        <section class="content">
+          <div class="page-heading">
+            <div>
+              <div class="eyebrow">Account settings</div>
+              <h1>My Profile</h1>
+              <p class="subtitle">
+                Manage your account and contact information.
+              </p>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="profile-row" style="margin-bottom: 25px">
+              <div class="profile-avatar">S</div>
+              <div>
+                <h2 style="margin: 0 0 4px">Student User</h2>
+                <p class="subtitle">student@example.edu · Alangilan Campus</p>
+              </div>
+            </div>
+            <form class="form-grid">
+              <div class="form-group">
+                <label>First name</label><input class="field" value="Student" />
+              </div>
+              <div class="form-group">
+                <label>Last name</label><input class="field" value="User" />
+              </div>
+              <div class="form-group">
+                <label>School email</label
+                ><input
+                  class="field"
+                  value="student@example.edu"
+                  type="email"
+                />
+              </div>
+              <div class="form-group">
+                <label>Student number</label
+                ><input class="field" value="20XX-XXXXX" />
+              </div>
+              <div class="form-group">
+                <label>Campus</label
+                ><select class="select">
+                  <option>Alangilan Campus</option>
+                  <option>ARASOF Nasugbu Campus</option>
+                  <option>Lemery Campus</option>
+                  <option>Pablo Borbon Campus</option>
+                  <option>JPLPC Malvar Campus</option>
+                  <option>Balayan Campus</option>
+                  <option>San Juan Campus</option>
+                  <option>Mabini Campus</option>
+                  <option>Lobo Campus</option>
+                  <option>Rosario Campus</option>
+                  <option>Lipa Campus</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Contact number</label
+                ><input class="field" placeholder="09XX XXX XXXX" />
+              </div>
+              <div class="form-group full">
+                <button class="btn btn-primary" type="button">
+                  Save changes
+                </button>
+              </div>
+            </form>
+          </div>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>

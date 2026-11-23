@@ -1,0 +1,139 @@
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Register | BatStateU Lost & Found</title>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <div class="auth-page">
+      <section class="auth-art">
+        <div>
+          <div class="brand" style="margin: 0 0 55px">⌕</div>
+          <div class="eyebrow" style="color: #9fc0ff">JOIN THE COMMUNITY</div>
+          <h1>Help reunite people with their belongings.</h1>
+          <p>
+            Create an account to report lost or found items and manage your
+            claims across BatStateU campuses.
+          </p>
+        </div>
+        <p>Lost & Found Portal · Student Community</p>
+      </section>
+
+      <section class="auth-form-side">
+        <div class="auth-box">
+          <a class="back-link" href="feed.html">← Back to listings</a>
+          <div style="height: 25px"></div>
+
+          <div class="eyebrow">Get started</div>
+          <h1>Create your account</h1>
+
+          <form class="form-grid" id="registerForm">
+            <div class="form-group">
+              <label for="firstName">First name</label>
+              <input
+                class="field"
+                id="firstName"
+                type="text"
+                placeholder="First name"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="lastName">Last name</label>
+              <input
+                class="field"
+                id="lastName"
+                type="text"
+                placeholder="Last name"
+                required
+              />
+            </div>
+
+            <div class="form-group full">
+              <label for="email">School email</label>
+              <input
+                class="field"
+                id="email"
+                type="email"
+                placeholder="name@batangas-state-u.edu.ph"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="studentNumber">Student number</label>
+              <input
+                class="field"
+                id="studentNumber"
+                type="text"
+                placeholder="Student number"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="campus">Campus</label>
+              <select class="select" id="campus" required>
+                <option value="">Select campus</option>
+                <option>ARASOF Nasugbu Campus</option>
+                <option>Lemery Campus</option>
+                <option>Alangilan Campus</option>
+                <option>Pablo Borbon Campus</option>
+                <option>JPLPC Malvar Campus</option>
+                <option>Balayan Campus</option>
+                <option>San Juan Campus</option>
+                <option>Mabini Campus</option>
+                <option>Lobo Campus</option>
+                <option>Rosario Campus</option>
+                <option>Lipa Campus</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="password">Password</label>
+              <input
+                class="field"
+                id="password"
+                type="password"
+                placeholder="Create password"
+                minlength="8"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="confirmPassword">Confirm password</label>
+              <input
+                class="field"
+                id="confirmPassword"
+                type="password"
+                placeholder="Confirm password"
+                required
+              />
+            </div>
+
+            <div class="form-group full">
+              <p id="registerMessage" class="notice" role="status" aria-live="polite" hidden></p>
+              <button class="btn btn-primary" type="submit">
+                Create account
+              </button>
+            </div>
+          </form>
+
+          <p class="subtitle" style="text-align: center; margin-top: 20px">
+            Already registered?
+            <a class="back-link" href="index.html">Sign in</a>
+          </p>
+        </div>
+      </section>
+    </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/auth.js"></script>
+  </body>
+</html>

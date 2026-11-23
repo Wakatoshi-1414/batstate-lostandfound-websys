@@ -1,0 +1,164 @@
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Report an Item | BatStateU Lost & Found</title>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <div class="app">
+      <aside class="sidebar">
+        <a class="brand" href="feed.html" aria-label="BatStateU Lost and Found">⌕</a>
+        <nav class="nav">
+          <a href="user-dashboard.html" title="Dashboard">⌂<span>Dashboard</span></a>
+          <a href="feed.html" title="Feed">▦<span>Feed</span></a>
+          <a href="report-item.html" class="active" title="Report item">＋<span>Report</span></a>
+          <a href="my-listings.html" title="My listings">▤<span>My Listings</span></a>
+          <a href="notifications.html" title="Notifications">♧<span>Alerts</span></a>
+          <a href="profile.html" title="Profile">⚙<span>Profile</span></a>
+        </nav>
+        <div class="sidebar-bottom">
+          <a href="index.html" title="Sign out">⇥</a>
+        </div>
+      </aside>
+
+      <main class="main">
+        <header class="topbar">
+          <label class="search">
+            <span>⌕</span>
+            <input type="search" placeholder="Search for an item..." aria-label="Search listings" />
+          </label>
+          <div class="top-actions">
+            <a class="icon-btn" href="feed.html" title="Browse">▦</a>
+            <a class="icon-btn" href="notifications.html" title="Notifications">♧</a>
+            <a class="avatar" href="profile.html" title="Profile">S</a>
+          </div>
+        </header>
+
+        <section class="content">
+          <div class="page-heading">
+            <div>
+              <div class="eyebrow">Community contribution</div>
+              <h1>Report an item</h1>
+              <p class="subtitle">
+                Share enough details to help the right person identify their belongings.
+              </p>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="notice" style="margin-bottom: 22px">
+              Your listing will appear in the feed immediately after submission.
+              Avoid posting sensitive personal information or full student ID numbers in photos.
+            </div>
+
+            <form class="form-grid" id="reportForm">
+              <div class="form-group">
+                <label for="reportType">Report type *</label>
+                <select class="select" id="reportType" required>
+                  <option value="Found">Found item</option>
+                  <option value="Lost">Lost item</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="itemName">Item name *</label>
+                <input class="field" id="itemName" placeholder="e.g. Brown leather wallet" required />
+              </div>
+
+              <div class="form-group">
+                <label for="itemCategory">Category *</label>
+                <select class="select" id="itemCategory" required>
+                  <option value="">Select category</option>
+                  <option>Electronics</option>
+                  <option>Documents / IDs</option>
+                  <option>Bags</option>
+                  <option>Personal Belongings</option>
+                  <option>Clothing</option>
+                  <option>Others</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="itemCampus">Campus *</label>
+                <select class="select" id="itemCampus" required>
+                  <option value="">Select campus</option>
+                  <option>ARASOF Nasugbu Campus</option>
+                  <option>Lemery Campus</option>
+                  <option>Alangilan Campus</option>
+                  <option>Pablo Borbon Campus</option>
+                  <option>JPLPC Malvar Campus</option>
+                  <option>Balayan Campus</option>
+                  <option>San Juan Campus</option>
+                  <option>Mabini Campus</option>
+                  <option>Lobo Campus</option>
+                  <option>Rosario Campus</option>
+                  <option>Lipa Campus</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="itemLocation">Specific location *</label>
+                <input class="field" id="itemLocation" placeholder="e.g. Near the library entrance" required />
+              </div>
+
+              <div class="form-group">
+                <label for="itemDate">Date lost / found *</label>
+                <input class="field" type="date" id="itemDate" required />
+              </div>
+
+              <div class="form-group full">
+                <label for="itemDescription">Description *</label>
+                <textarea class="textarea" id="itemDescription"
+                  placeholder="Describe the item, distinguishing marks, and any useful details..."
+                  required></textarea>
+              </div>
+
+              <div class="form-group full">
+                <label for="itemPhotos">Item photographs</label>
+                <div class="upload">
+                  <div style="font-size: 30px">⇧</div>
+                  <strong>Choose photos to upload</strong>
+                  <span class="helper">PNG, JPG or WEBP · Maximum 3 photos</span>
+                  <input type="file" id="itemPhotos" accept="image/png,image/jpeg,image/webp" multiple
+                    style="display: block; margin: 14px auto 0" />
+                  <div id="photoPreview" style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:14px"></div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="contactEmail">Contact email *</label>
+                <input class="field" type="email" id="contactEmail" placeholder="Your school email" required />
+              </div>
+
+              <div class="form-group">
+                <label for="contactNumber">Contact number (optional)</label>
+                <input class="field" type="tel" id="contactNumber" placeholder="09XX XXX XXXX" />
+              </div>
+
+              <div class="form-group full">
+                <label>
+                  <input type="checkbox" id="confirmAccuracy" required />
+                  I confirm that the information provided is accurate and I agree to be contacted about this listing.
+                </label>
+              </div>
+
+              <div id="reportMessage" class="form-group full" hidden></div>
+
+              <div class="form-group full" style="display:flex;gap:10px;flex-direction:row">
+                <a class="btn btn-outline" href="feed.html">Cancel</a>
+                <button class="btn btn-primary" type="submit">Publish listing</button>
+              </div>
+            </form>
+          </div>
+        </section>
+      </main>
+    </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/listings.js"></script>
+  </body>
+</html>

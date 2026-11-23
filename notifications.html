@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Notifications | BatStateU Lost & Found</title>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <div class="app">
+      <aside class="sidebar">
+        <a class="brand" href="feed.html" aria-label="BatStateU Lost and Found"
+          >⌕</a
+        >
+        <nav class="nav">
+          <a href="user-dashboard.html" title="Dashboard"
+            >⌂<span>Dashboard</span></a
+          >
+          <a href="feed.html" title="Feed">▦<span>Feed</span></a>
+          <a href="report-item.html" title="Report item"
+            >＋<span>Report</span></a
+          >
+          <a href="my-listings.html" title="My listings"
+            >▤<span>My Listings</span></a
+          >
+          <a href="notifications.html" class="active" title="Notifications"
+            >♧<span>Alerts</span></a
+          >
+          <a href="profile.html" title="Profile">⚙<span>Profile</span></a>
+        </nav>
+        <div class="sidebar-bottom">
+          <a href="index.html" title="Sign out">⇥</a>
+        </div>
+      </aside>
+      <main class="main">
+        <header class="topbar">
+          <label class="search"
+            ><span>⌕</span
+            ><input
+              type="search"
+              placeholder="Search for an item..."
+              aria-label="Search listings"
+          /></label>
+          <div class="top-actions">
+            <a class="icon-btn" href="feed.html" title="Browse">▦</a>
+            <a class="icon-btn" href="notifications.html" title="Notifications"
+              >♧</a
+            >
+            <a class="avatar" href="profile.html" title="Profile">S</a>
+          </div>
+        </header>
+        <section class="content">
+          <div class="page-heading">
+            <div>
+              <div class="eyebrow">Stay updated</div>
+              <h1>Notifications</h1>
+              <p class="subtitle">
+                Updates about your listings and claim requests.
+              </p>
+            </div>
+            <button class="btn btn-outline" type="button">
+              Mark all as read
+            </button>
+          </div>
+          <div class="panel">
+            <div style="padding: 15px 0; border-bottom: 1px solid var(--line)">
+              <span class="status claimed" style="position: static"
+                >Claim update</span
+              >
+              <h3 style="margin-top: 12px">
+                Someone submitted a claim request
+              </h3>
+              <p class="subtitle">
+                A student has submitted a claim for your reported item, Black
+                umbrella.
+              </p>
+              <small class="helper">Today · 10:42 AM</small>
+            </div>
+            <div style="padding: 15px 0; border-bottom: 1px solid var(--line)">
+              <span class="status available" style="position: static"
+                >Listing published</span
+              >
+              <h3 style="margin-top: 12px">Your listing is now visible</h3>
+              <p class="subtitle">
+                Your report for Student notebook has been published to the
+                campus feed.
+              </p>
+              <small class="helper">Yesterday · 3:15 PM</small>
+            </div>
+            <div style="padding: 15px 0">
+              <span class="status returned" style="position: static"
+                >Returned</span
+              >
+              <h3 style="margin-top: 12px">Item marked as returned</h3>
+              <p class="subtitle">
+                Your USB drive listing has been marked as successfully returned.
+              </p>
+              <small class="helper">November 2, 2026</small>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>

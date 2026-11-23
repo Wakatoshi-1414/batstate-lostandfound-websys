@@ -1,0 +1,91 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Listings | BatStateU Lost & Found</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="app">
+    <aside class="sidebar">
+        <a class="brand" href="feed.html" aria-label="BatStateU Lost and Found">⌕</a>
+        <nav class="nav">
+            <a href="user-dashboard.html">⌂<span>Dashboard</span></a>
+            <a href="feed.html">▦<span>Feed</span></a>
+            <a href="report-item.html">＋<span>Report</span></a>
+            <a href="my-listings.html" class="active">▤<span>My Listings</span></a>
+            <a href="notifications.html">♧<span>Alerts</span></a>
+            <a href="profile.html">⚙<span>Profile</span></a>
+        </nav>
+        <div class="sidebar-bottom">
+            <a href="index.html" title="Sign out">⇥</a>
+        </div>
+    </aside>
+
+    <main class="main">
+        <header class="topbar">
+            <label class="search">
+                <span>⌕</span>
+                <input type="search" placeholder="Search for an item..." aria-label="Search listings">
+            </label>
+            <div class="top-actions">
+                <a class="icon-btn" href="feed.html">▦</a>
+                <a class="icon-btn" href="notifications.html">♧</a>
+                <a class="avatar" href="profile.html">S</a>
+            </div>
+        </header>
+
+        <section class="content">
+            <div class="page-heading">
+                <div>
+                    <div class="eyebrow">Your activity</div>
+                    <h1>My Listings</h1>
+                    <p class="subtitle">Manage your reported items and incoming claim requests.</p>
+                </div>
+                <a class="btn btn-primary" href="report-item.html">＋ New listing</a>
+            </div>
+
+            <div class="filters" id="myListingFilters">
+                <button class="chip active" type="button" data-filter="All">All</button>
+                <button class="chip" type="button" data-filter="Lost">Lost</button>
+                <button class="chip" type="button" data-filter="Found">Found</button>
+                <button class="chip" type="button" data-filter="Claimed">Claimed</button>
+                <button class="chip" type="button" data-filter="Returned">Returned</button>
+            </div>
+
+            <div class="panel">
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Type</th>
+                                <th>Campus</th>
+                                <th>Date posted</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="myListingsBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div style="margin-top:30px">
+                <div class="page-heading">
+                    <div>
+                        <h2>Incoming claim requests</h2>
+                        <p class="subtitle">Review people who have requested to claim your found items.</p>
+                    </div>
+                </div>
+                <div id="claimRequestsList" class="grid"></div>
+            </div>
+        </section>
+    </main>
+</div>
+
+<script src="js/claims.js"></script>
+</body>
+</html>

@@ -1,0 +1,104 @@
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Feed | BatStateU Lost & Found</title>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <div class="app">
+      <aside class="sidebar">
+        <a class="brand" href="feed.html" aria-label="BatStateU Lost and Found">⌕</a>
+        <nav class="nav">
+          <a href="user-dashboard.html" title="Dashboard">⌂<span>Dashboard</span></a>
+          <a href="feed.html" class="active" title="Feed">▦<span>Feed</span></a>
+          <a href="report-item.html" title="Report item">＋<span>Report</span></a>
+          <a href="my-listings.html" title="My listings">▤<span>My Listings</span></a>
+          <a href="notifications.html" title="Notifications">♧<span>Alerts</span></a>
+          <a href="profile.html" title="Profile">⚙<span>Profile</span></a>
+        </nav>
+        <div class="sidebar-bottom">
+          <a href="index.html" title="Sign out">⇥</a>
+        </div>
+      </aside>
+
+      <main class="main">
+        <header class="topbar">
+          <label class="search">
+            <span>⌕</span>
+            <input type="search" id="feedSearch" placeholder="Search for an item..." aria-label="Search listings" />
+          </label>
+          <div class="top-actions">
+            <a class="icon-btn" href="feed.html" title="Browse">▦</a>
+            <a class="icon-btn" href="notifications.html" title="Notifications">♧</a>
+            <a class="avatar" href="profile.html" title="Profile">S</a>
+          </div>
+        </header>
+
+        <section class="content">
+          <div class="page-heading">
+            <div>
+              <div class="eyebrow">Community marketplace</div>
+              <h1>Lost something? Found something?</h1>
+              <p class="subtitle">
+                Browse reported items across Batangas State University campuses.
+              </p>
+            </div>
+            <a class="btn btn-primary" href="report-item.html">＋ Report an item</a>
+          </div>
+
+          <div class="filters">
+            <select class="select filter-select" id="campusFilter">
+              <option value="">All Campuses</option>
+              <option>ARASOF Nasugbu Campus</option>
+              <option>Lemery Campus</option>
+              <option>Alangilan Campus</option>
+              <option>Pablo Borbon Campus</option>
+              <option>JPLPC Malvar Campus</option>
+              <option>Balayan Campus</option>
+              <option>San Juan Campus</option>
+              <option>Mabini Campus</option>
+              <option>Lobo Campus</option>
+              <option>Rosario Campus</option>
+              <option>Lipa Campus</option>
+            </select>
+
+            <select class="select filter-select" id="categoryFilter">
+              <option value="">All categories</option>
+              <option>Electronics</option>
+              <option>Documents / IDs</option>
+              <option>Bags</option>
+              <option>Personal Belongings</option>
+              <option>Clothing</option>
+              <option>Others</option>
+            </select>
+
+            <button class="chip active" type="button" data-type="All">All items</button>
+            <button class="chip" type="button" data-type="Lost">Lost</button>
+            <button class="chip" type="button" data-type="Found">Found</button>
+          </div>
+
+          <div class="page-heading">
+            <div>
+              <h2>Recent listings</h2>
+              <p class="subtitle" id="feedSubtitle">Browse the latest lost and found reports.</p>
+            </div>
+            <span class="helper" id="listingCount">0 items</span>
+          </div>
+
+          <div class="grid" id="listingGrid"></div>
+
+          <p class="footer-note">
+            Batangas State University • Lost & Found Portal
+          </p>
+        </section>
+      </main>
+    </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/listings.js"></script>
+  </body>
+</html>

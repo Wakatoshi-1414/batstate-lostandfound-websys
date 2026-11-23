@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard | BatStateU Lost & Found</title>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <div class="app">
+      <aside class="sidebar">
+        <a class="brand" href="feed.html" aria-label="BatStateU Lost and Found"
+          >⌕</a
+        >
+        <nav class="nav">
+          <a href="user-dashboard.html" class="active" title="Dashboard"
+            >⌂<span>Dashboard</span></a
+          >
+          <a href="feed.html" title="Feed">▦<span>Feed</span></a>
+          <a href="report-item.html" title="Report item"
+            >＋<span>Report</span></a
+          >
+          <a href="my-listings.html" title="My listings"
+            >▤<span>My Listings</span></a
+          >
+          <a href="notifications.html" title="Notifications"
+            >♧<span>Alerts</span></a
+          >
+          <a href="profile.html" title="Profile">⚙<span>Profile</span></a>
+        </nav>
+        <div class="sidebar-bottom">
+          <a href="index.html" title="Sign out">⇥</a>
+        </div>
+      </aside>
+      <main class="main">
+        <header class="topbar">
+          <label class="search"
+            ><span>⌕</span
+            ><input
+              type="search"
+              placeholder="Search for an item..."
+              aria-label="Search listings"
+          /></label>
+          <div class="top-actions">
+            <a class="icon-btn" href="feed.html" title="Browse">▦</a>
+            <a class="icon-btn" href="notifications.html" title="Notifications"
+              >♧</a
+            >
+            <a class="avatar" href="profile.html" title="Profile">S</a>
+          </div>
+        </header>
+        <section class="content">
+          <div class="page-heading">
+            <div>
+              <div class="eyebrow">Administration</div>
+              <h1>Admin Dashboard</h1>
+              <p class="subtitle">
+                Monitor portal activity and manage the campus community.
+              </p>
+            </div>
+            <span class="chip active">Administrator</span>
+          </div>
+          <div class="stats">
+            <div class="stat">
+              <div class="stat-icon">♙</div>
+              <strong>1,248</strong><small>Registered users</small>
+            </div>
+            <div class="stat">
+              <div class="stat-icon">▤</div>
+              <strong>386</strong><small>Total listings</small>
+            </div>
+            <div class="stat">
+              <div class="stat-icon">⌕</div>
+              <strong>27</strong><small>Open claims</small>
+            </div>
+            <div class="stat">
+              <div class="stat-icon">⚑</div>
+              <strong>05</strong><small>Reported concerns</small>
+            </div>
+          </div>
+          <div class="two-col">
+            <section class="panel">
+              <h2>Recent listing activity</h2>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Item</th>
+                      <th>Campus</th>
+                      <th>Posted by</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Brown wallet</td>
+                      <td>Lemery</td>
+                      <td>Student 1024</td>
+                      <td>Available</td>
+                    </tr>
+                    <tr>
+                      <td>Student ID</td>
+                      <td>Pablo Borbon</td>
+                      <td>Student 0842</td>
+                      <td>Lost</td>
+                    </tr>
+                    <tr>
+                      <td>Wireless earbuds</td>
+                      <td>San Juan</td>
+                      <td>Student 2310</td>
+                      <td>Available</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <a class="back-link" href="my-listings.html">Manage listings →</a>
+            </section>
+            <section class="panel">
+              <h2>Administration tools</h2>
+              <p>
+                <a class="btn btn-light" href="feed.html"
+                  >▤ View all listings</a
+                >
+              </p>
+              <p><a class="btn btn-outline" href="#">♙ Manage users</a></p>
+              <p><a class="btn btn-outline" href="#">⚑ Review reports</a></p>
+              <p><a class="btn btn-outline" href="#">⌖ Campus settings</a></p>
+              <div class="notice">
+                Listings are published immediately. Admin tools are for
+                moderation, resolving reports, and removing inappropriate
+                content.
+              </div>
+            </section>
+          </div>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>

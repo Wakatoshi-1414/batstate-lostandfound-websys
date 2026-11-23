@@ -1,0 +1,197 @@
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard | BatStateU Lost & Found</title>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <div class="app">
+      <aside class="sidebar">
+        <a class="brand" href="feed.html" aria-label="BatStateU Lost and Found">
+          ⌕
+        </a>
+
+        <nav class="nav">
+          <a href="user-dashboard.html" class="active" title="Dashboard">
+            ⌂<span>Dashboard</span>
+          </a>
+          <a href="feed.html" title="Feed">
+            ▦<span>Feed</span>
+          </a>
+          <a href="report-item.html" title="Report item">
+            ＋<span>Report</span>
+          </a>
+          <a href="my-listings.html" title="My listings">
+            ▤<span>My Listings</span>
+          </a>
+          <a href="notifications.html" title="Notifications">
+            ♧<span>Alerts</span>
+          </a>
+          <a href="profile.html" title="Profile">
+            ⚙<span>Profile</span>
+          </a>
+        </nav>
+
+        <div class="sidebar-bottom">
+          <a href="index.html" id="logoutBtn" title="Sign out">⇥</a>
+        </div>
+      </aside>
+
+      <main class="main">
+        <header class="topbar">
+          <label class="search">
+            <span>⌕</span>
+            <input
+              type="search"
+              placeholder="Search for an item..."
+              aria-label="Search listings"
+            />
+          </label>
+
+          <div class="top-actions">
+            <a class="icon-btn" href="feed.html" title="Browse">▦</a>
+            <a class="icon-btn" href="notifications.html" title="Notifications">
+              ♧
+            </a>
+            <a
+              class="avatar"
+              id="userAvatar"
+              href="profile.html"
+              title="Profile"
+            >
+              S
+            </a>
+          </div>
+        </header>
+
+        <section class="content">
+          <div class="page-heading">
+            <div>
+              <div class="eyebrow">Student workspace</div>
+              <h1 id="welcomeName">Welcome back!</h1>
+              <p class="subtitle">
+                Here's what's happening with your lost and found activity.
+              </p>
+            </div>
+
+            <a class="btn btn-primary" href="report-item.html">
+              ＋ Report an item
+            </a>
+          </div>
+
+          <div class="stats">
+            <div class="stat">
+              <div class="stat-icon">▤</div>
+              <strong>04</strong>
+              <small>Your active listings</small>
+            </div>
+
+            <div class="stat">
+              <div class="stat-icon">♧</div>
+              <strong>02</strong>
+              <small>New notifications</small>
+            </div>
+
+            <div class="stat">
+              <div class="stat-icon">⌕</div>
+              <strong>01</strong>
+              <small>Claims in progress</small>
+            </div>
+
+            <div class="stat">
+              <div class="stat-icon">✓</div>
+              <strong>02</strong>
+              <small>Items returned</small>
+            </div>
+          </div>
+
+          <div class="two-col">
+            <section class="panel">
+              <h2>Your recent listings</h2>
+
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Item</th>
+                      <th>Campus</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    <tr>
+                      <td>Black umbrella</td>
+                      <td>Alangilan</td>
+                      <td>
+                        <span class="status available" style="position: static">
+                          Available
+                        </span>
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td>Student notebook</td>
+                      <td>Alangilan</td>
+                      <td>
+                        <span class="status claimed" style="position: static">
+                          Claim pending
+                        </span>
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td>USB drive</td>
+                      <td>Pablo Borbon</td>
+                      <td>
+                        <span class="status returned" style="position: static">
+                          Returned
+                        </span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <p style="margin: 18px 0 0">
+                <a class="back-link" href="my-listings.html">
+                  View all listings →
+                </a>
+              </p>
+            </section>
+
+            <section class="panel">
+              <h2>Quick actions</h2>
+              <p class="subtitle">What would you like to do today?</p>
+
+              <p>
+                <a class="btn btn-light" href="report-item.html">
+                  ＋ Report lost or found item
+                </a>
+              </p>
+
+              <p>
+                <a class="btn btn-outline" href="feed.html">
+                  ▦ Browse item feed
+                </a>
+              </p>
+
+              <p>
+                <a class="btn btn-outline" href="notifications.html">
+                  ♧ Check notifications
+                </a>
+              </p>
+            </section>
+          </div>
+        </section>
+      </main>
+    </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/auth.js"></script>
+  </body>
+</html>

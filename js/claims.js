@@ -1,125 +1,181 @@
 
-// ==========================================
-// SHARED STORAGE FUNCTIONS
-// ==========================================
+(() => {
+    const db = window.supabaseClient;
 
-function getListings() {
-    try {
-        return JSON.parse(localStorage.getItem("listings")) || [];
-    } catch (error) {
-        return [];
-    }
-}
+    // ==========================================
+    // SHARED FUNCTIONS
+    // ==========================================
 
-function saveListings(listings) {
-    localStorage.setItem("listings", JSON.stringify(listings));
-}
+    function escapeHTML(value) {
+        return String(value ?? "").replace(/[&<>"']/g, character => {
+            const characters = {
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#039;"
+            };
 
-function getClaims() {
-    try {
-        return JSON.parse(localStorage.getItem("claims")) || [];
-    } catch (error) {
-        return [];
-    }
-}
-
-function saveClaims(claims) {
-    localStorage.setItem("claims", JSON.stringify(claims));
-}
-
-function getCurrentUser() {
-    try {
-        return JSON.parse(localStorage.getItem("currentUser"));
-    } catch (error) {
-        return null;
-    }
-}
-
-function escapeHTML(value) {
-    return String(value ?? "").replace(/[&<>"']/g, function(character) {
-        const characters = {
-            "&": "&amp;",
-            "<": "&lt;",
-            ">": "&gt;",
-            '"': "&quot;",
-            "'": "&#039;"
-        };
-
-        return characters[character];
-    });
-}
-
-function formatListingDate(value) {
-    const date = new Date(value + "T00:00:00");
-
-    if (isNaN(date.getTime())) {
-        return value || "Unknown date";
+            return characters[character];
+        });
     }
 
-    return date.toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
-        year: "numeric"
-    });
-}
+    function formatDate(value) {
+        if (!value) return "Unknown date";
 
-// Use the reporter's email to identify the listing owner.
-// This also supports listings created before ownerEmail was added.
-function getOwnerEmail(item) {
-    return (item.ownerEmail || item.contactEmail || "").trim().toLowerCase();
-}
+        const date = new Date(value + "T00:00:00");
 
-// ==========================================
-// ITEM DETAILS PAGE
-// ==========================================
+        if (isNaN(date.getTime())) return value;
 
-const claimForm = document.getElementById("claimForm");
+        return date.toLocaleDateString("en-US", {
+            month: "short",
+            day: "numeric",
+            year: "numeric"
+        });
+    }
 
-if (claimForm) {
-    const params = new URLSearchParams(window.location.search);
-    const listingId = params.get("id");
+    async function getCurrentUser() {
+        const { data, error } = await db.auth.getUser();
 
-    const listings = getListings();
-    const item = listings.find(function(listing) {
-        return listing.id === listingId;
-    });
+        if (error) {
+            console.error("User error:", error);
+            return null;
+        }
 
-    const claimSection = document.getElementById("claimSection");
-    const ownerMessage = document.getElementById("ownerMessage");
+        return data.user;
+    }
 
-    if (!item) {
-        document.getElementById("detailName").textContent = "Item not found";
-        document.getElementById("detailDescription").textContent =
-            "This listing does not exist or may have been removed.";
+    async function getUserProfile(userId) {
+        const { data, error } = await db
+            .from("profiles")
+            .select("*")
+            .eq("id", userId)
+            .maybeSingle();
 
-        claimSection.hidden = true;
-    } else {
-        const currentUser = getCurrentUser();
-        const currentEmail = currentUser && currentUser.email
-            ? currentUser.email.trim().toLowerCase()
-            : "";
+        if (error) {
+            console.error("Profile error:", error);
+            return null;
+        }
 
-        const ownerEmail = getOwnerEmail(item);
-        const isOwner = currentEmail !== "" && currentEmail === ownerEmail;
-        const isClaimed = item.status === "Claimed" || item.status === "Returned";
+        return data;
+    }
+
+    function showMessage(element, message) {
+        if (!element) return;
+
+        element.hidden = false;
+        element.textContent = message;
+    }
+
+    function getFullName(profile) {
+        if (!profile) return "";
+
+        return `${profile.first_name || ""} ${profile.last_name || ""}`.trim();
+    }
+
+    // ==========================================
+    // ITEM DETAILS PAGE
+    // ==========================================
+
+    async function initItemDetails() {
+        const claimForm = document.getElementById("claimForm");
+
+        if (!claimForm) return;
+
+        const params = new URLSearchParams(window.location.search);
+        const listingId = params.get("id");
+
+        const claimSection = document.getElementById("claimSection");
+        const ownerMessage = document.getElementById("ownerMessage");
+        const claimMessage = document.getElementById("claimMessage");
+
+        if (!listingId) {
+            document.getElementById("detailName").textContent = "Item not found";
+            document.getElementById("detailDescription").textContent =
+                "No listing ID was provided.";
+
+            claimSection.hidden = true;
+            return;
+        }
+
+        // GET LISTING FROM SUPABASE
+        const { data: item, error } = await db
+            .from("listings")
+            .select("*")
+            .eq("id", listingId)
+            .maybeSingle();
+
+        if (error) {
+            console.error("Listing retrieval error:", error);
+
+            document.getElementById("detailName").textContent =
+                "Unable to load item";
+
+            document.getElementById("detailDescription").textContent =
+                error.message;
+
+            claimSection.hidden = true;
+            return;
+        }
+
+        if (!item) {
+            document.getElementById("detailName").textContent = "Item not found";
+            document.getElementById("detailDescription").textContent =
+                "This listing does not exist or may have been removed.";
+
+            claimSection.hidden = true;
+            return;
+        }
+
+        // GET CURRENT USER
+        const currentUser = await getCurrentUser();
+
+        let profile = null;
+
+        if (currentUser) {
+            profile = await getUserProfile(currentUser.id);
+        }
+
+        const isOwner = currentUser && currentUser.id === item.owner_id;
+
+        const isClaimed =
+            item.status === "Claimed" ||
+            item.status === "Returned" ||
+            item.status === "Closed";
+
+        // ==========================================
+        // DISPLAY ITEM INFORMATION
+        // ==========================================
 
         document.title = item.name + " | BatStateU Lost & Found";
 
         document.getElementById("detailName").textContent = item.name;
-        document.getElementById("detailId").textContent = "Listing ID: " + item.id;
+        document.getElementById("detailId").textContent =
+            "Listing ID: " + item.id;
+
         document.getElementById("detailHeading").textContent = item.name;
         document.getElementById("detailCategory").textContent = item.category;
-        document.getElementById("detailDescription").textContent = item.description;
+        document.getElementById("detailDescription").textContent =
+            item.description;
+
         document.getElementById("detailDate").textContent =
-            "▦  Reported: " + formatListingDate(item.date);
+            "▦  Reported: " + formatDate(item.item_date);
+
         document.getElementById("detailCampus").textContent =
             "⌖  " + item.campus;
+
         document.getElementById("detailLocation").textContent =
             "⌖  " + item.location;
+
         document.getElementById("detailType").textContent =
             "▣  Type: " + item.type;
+
         document.getElementById("detailPoster").textContent =
-            "Posted by: " + (item.postedBy || "Unknown user");
+            "Posted by: " + (isOwner ? "You" : "Student");
+
+        // ==========================================
+        // ITEM STATUS
+        // ==========================================
 
         const statusElement = document.getElementById("detailStatus");
 
@@ -132,29 +188,42 @@ if (claimForm) {
         } else if (item.type === "Lost") {
             statusElement.textContent = "LOST ITEM";
             statusElement.className = "status lost";
+        } else if (item.status === "Closed") {
+            statusElement.textContent = "CLOSED";
+            statusElement.className = "status";
         } else {
             statusElement.textContent = "FOUND • AVAILABLE";
             statusElement.className = "status available";
         }
 
+        // ==========================================
         // CONTACT REPORTER
+        // ==========================================
+
         const contactLink = document.getElementById("contactReporter");
 
-        if (item.contactEmail) {
-            contactLink.href = "mailto:" + encodeURIComponent(item.contactEmail);
+        if (item.contact_email) {
+            contactLink.href =
+                "mailto:" + encodeURIComponent(item.contact_email);
         } else {
             contactLink.hidden = true;
         }
 
+        // ==========================================
         // DISPLAY PHOTOS
+        // ==========================================
+
         const mainPhoto = document.getElementById("mainPhoto");
         const thumbnailRow = document.getElementById("thumbnailRow");
 
-        if (item.photos && item.photos.length > 0) {
+        const photos = item.photo_urls || [];
+
+        if (photos.length > 0) {
             mainPhoto.innerHTML = "";
 
             const mainImage = document.createElement("img");
-            mainImage.src = item.photos[0];
+
+            mainImage.src = photos[0];
             mainImage.alt = item.name;
             mainImage.style.width = "100%";
             mainImage.style.height = "100%";
@@ -162,7 +231,9 @@ if (claimForm) {
 
             mainPhoto.appendChild(mainImage);
 
-            item.photos.forEach(function(photo, index) {
+            thumbnailRow.innerHTML = "";
+
+            photos.forEach((photo, index) => {
                 const thumbnail = document.createElement("img");
 
                 thumbnail.src = photo;
@@ -171,7 +242,7 @@ if (claimForm) {
                 thumbnail.style.objectFit = "cover";
                 thumbnail.style.cursor = "pointer";
 
-                thumbnail.addEventListener("click", function() {
+                thumbnail.addEventListener("click", () => {
                     mainImage.src = photo;
                 });
 
@@ -179,450 +250,540 @@ if (claimForm) {
             });
         }
 
+        // ==========================================
         // CLAIM FORM VISIBILITY
+        // ==========================================
+
         if (item.type !== "Found") {
             claimSection.hidden = true;
             ownerMessage.hidden = false;
             ownerMessage.textContent =
                 "Only found items can receive claim requests.";
+
         } else if (isClaimed) {
             claimSection.hidden = true;
             ownerMessage.hidden = false;
             ownerMessage.textContent =
-                "This item has already been claimed or returned.";
+                "This item is no longer available for claiming.";
+
         } else if (isOwner) {
             claimSection.hidden = true;
             ownerMessage.hidden = false;
             ownerMessage.textContent =
                 "This is your listing. You can review incoming claim requests in My Listings.";
+
+        } else if (!currentUser) {
+            claimSection.hidden = true;
+            ownerMessage.hidden = false;
+            ownerMessage.textContent =
+                "Please log in to submit a claim request.";
+
         } else {
             // PREFILL CLAIMANT INFORMATION
-            if (currentUser) {
-                document.getElementById("claimName").value =
-                    currentUser.firstName + " " + currentUser.lastName;
 
-                document.getElementById("claimEmail").value =
-                    currentUser.email;
+            const claimName = document.getElementById("claimName");
+            const claimEmail = document.getElementById("claimEmail");
+
+            claimName.value = getFullName(profile);
+            claimEmail.value = currentUser.email || "";
+
+            // CHECK EXISTING CLAIM
+
+            const { data: existingClaims, error: existingError } = await db
+                .from("claims")
+                .select("id, status")
+                .eq("listing_id", item.id)
+                .eq("claimant_id", currentUser.id)
+                .in("status", ["Pending", "Approved"]);
+
+            if (existingError) {
+                console.error("Existing claim check error:", existingError);
             }
 
-            // CHECK FOR EXISTING CLAIM
-            const existingClaim = getClaims().find(function(claim) {
-                return claim.listingId === item.id &&
-                    claim.claimantEmail.toLowerCase() ===
-                    document.getElementById("claimEmail").value.trim().toLowerCase() &&
-                    claim.status === "Pending";
-            });
+            if (existingClaims && existingClaims.length > 0) {
+                showMessage(
+                    claimMessage,
+                    "You already submitted a claim for this item."
+                );
 
-            if (existingClaim) {
-                document.getElementById("claimMessage").hidden = false;
-                document.getElementById("claimMessage").textContent =
-                    "You already have a pending claim for this item.";
                 claimForm.querySelector("button[type='submit']").disabled = true;
             }
         }
 
+        // ==========================================
         // SUBMIT CLAIM
-        claimForm.addEventListener("submit", function(event) {
+        // ==========================================
+
+        claimForm.addEventListener("submit", async event => {
             event.preventDefault();
 
             const message = document.getElementById("claimMessage");
+            const submitButton =
+                claimForm.querySelector("button[type='submit']");
+
+            const user = await getCurrentUser();
+
+            if (!user) {
+                showMessage(message, "Please log in before submitting a claim.");
+                return;
+            }
 
             const claimantName =
                 document.getElementById("claimName").value.trim();
 
             const claimantEmail =
-                document.getElementById("claimEmail").value.trim().toLowerCase();
+                document.getElementById("claimEmail").value.trim();
 
             const reason =
                 document.getElementById("claimReason").value.trim();
 
-            message.hidden = false;
-
             if (!claimantName || !claimantEmail || !reason) {
-                message.textContent = "Please complete all required fields.";
+                showMessage(message, "Please complete all required fields.");
                 return;
             }
 
             if (!claimantEmail.includes("@")) {
-                message.textContent = "Please enter a valid email address.";
+                showMessage(message, "Please enter a valid email address.");
                 return;
             }
 
-            const latestListings = getListings();
-            const latestItem = latestListings.find(function(listing) {
-                return listing.id === item.id;
-            });
-
-            if (!latestItem || latestItem.type !== "Found" ||
-                latestItem.status === "Claimed" ||
-                latestItem.status === "Returned") {
-                message.textContent = "This item is no longer available for claiming.";
+            if (user.id === item.owner_id) {
+                showMessage(message, "You cannot claim your own listing.");
                 return;
             }
 
-            if (claimantEmail === getOwnerEmail(latestItem)) {
-                message.textContent = "You cannot claim your own listing.";
+            submitButton.disabled = true;
+            submitButton.textContent = "Submitting...";
+
+            // CHECK CURRENT LISTING STATUS AGAIN
+
+            const { data: latestItem, error: listingError } = await db
+                .from("listings")
+                .select("id, type, status, owner_id")
+                .eq("id", item.id)
+                .maybeSingle();
+
+            if (listingError || !latestItem) {
+                showMessage(message, "Unable to verify this listing.");
+                submitButton.disabled = false;
+                submitButton.textContent = "Submit Claim";
                 return;
             }
 
-            const claims = getClaims();
+            if (
+                latestItem.type !== "Found" ||
+                latestItem.status !== "Available"
+            ) {
+                showMessage(
+                    message,
+                    "This item is no longer available for claiming."
+                );
 
-            const duplicateClaim = claims.find(function(claim) {
-                return claim.listingId === item.id &&
-                    claim.claimantEmail.toLowerCase() === claimantEmail &&
-                    (claim.status === "Pending" || claim.status === "Approved");
-            });
-
-            if (duplicateClaim) {
-                message.textContent =
-                    "You already submitted a claim for this item.";
+                submitButton.disabled = false;
+                submitButton.textContent = "Submit Claim";
                 return;
             }
 
-            const newClaim = {
-                id: "claim-" + Date.now(),
-                listingId: item.id,
-                itemName: item.name,
-                ownerEmail: getOwnerEmail(latestItem),
-                claimantName: claimantName,
-                claimantEmail: claimantEmail,
-                reason: reason,
-                status: "Pending",
-                createdAt: new Date().toISOString()
-            };
+            // INSERT CLAIM INTO SUPABASE
 
-            claims.push(newClaim);
-            saveClaims(claims);
+            const { error: claimError } = await db
+                .from("claims")
+                .insert({
+                    listing_id: item.id,
+                    claimant_id: user.id,
+                    claimant_name: claimantName,
+                    claimant_email: claimantEmail,
+                    reason: reason,
+                    status: "Pending"
+                });
 
-            message.textContent =
-                "Your claim request has been submitted successfully!";
+            if (claimError) {
+                console.error("Claim submission error:", claimError);
+
+                if (claimError.code === "23505") {
+                    showMessage(
+                        message,
+                        "You already have an active claim for this item."
+                    );
+                } else {
+                    showMessage(
+                        message,
+                        "Unable to submit claim: " + claimError.message
+                    );
+                }
+
+                submitButton.disabled = false;
+                submitButton.textContent = "Submit Claim";
+                return;
+            }
+
+            showMessage(
+                message,
+                "Your claim request has been submitted successfully!"
+            );
 
             claimForm.reset();
 
-            const user = getCurrentUser();
+            const profile = await getUserProfile(user.id);
 
-            if (user) {
-                document.getElementById("claimName").value =
-                    user.firstName + " " + user.lastName;
+            document.getElementById("claimName").value =
+                getFullName(profile);
 
-                document.getElementById("claimEmail").value = user.email;
-            }
+            document.getElementById("claimEmail").value =
+                user.email || "";
 
-            claimForm.querySelector("button[type='submit']").disabled = true;
-        });
-    }
-}
-
-// ==========================================
-// MY LISTINGS PAGE
-// ==========================================
-
-const myListingsBody = document.getElementById("myListingsBody");
-
-if (myListingsBody) {
-    const currentUser = getCurrentUser();
-
-    const userEmail = currentUser && currentUser.email
-        ? currentUser.email.trim().toLowerCase()
-        : "";
-
-    const filterButtons = document.querySelectorAll("[data-filter]");
-    const claimRequestsList = document.getElementById("claimRequestsList");
-
-    let selectedFilter = "All";
-
-    function getMyListings() {
-        return getListings().filter(function(item) {
-            return getOwnerEmail(item) === userEmail;
+            submitButton.disabled = true;
+            submitButton.textContent = "Claim Submitted";
         });
     }
 
-    function renderMyListings() {
-        const myListings = getMyListings();
+    // ==========================================
+    // MY LISTINGS PAGE
+    // ==========================================
 
-        const filteredListings = myListings.filter(function(item) {
-            if (selectedFilter === "All") {
-                return true;
-            }
+    async function initMyListings() {
+        const myListingsBody = document.getElementById("myListingsBody");
 
-            if (selectedFilter === "Claimed") {
-                return item.status === "Claimed";
-            }
+        if (!myListingsBody) return;
 
-            if (selectedFilter === "Returned") {
-                return item.status === "Returned";
-            }
+        const claimRequestsList =
+            document.getElementById("claimRequestsList");
 
-            return item.type === selectedFilter;
-        });
+        const filterButtons = document.querySelectorAll("[data-filter]");
 
-        myListingsBody.innerHTML = "";
+        let selectedFilter = "All";
+        let currentUser = await getCurrentUser();
 
-        if (filteredListings.length === 0) {
+        if (!currentUser) {
             myListingsBody.innerHTML = `
                 <tr>
                     <td colspan="6" style="text-align:center;padding:25px">
-                        No listings found.
+                        Please log in to see your listings.
                     </td>
                 </tr>
             `;
-            return;
-        }
 
-        filteredListings.forEach(function(item) {
-            const row = document.createElement("tr");
-
-            let statusText = "Available";
-            let statusClass = "available";
-
-            if (item.status === "Claimed") {
-                statusText = "Claimed";
-                statusClass = "claimed";
-            } else if (item.status === "Returned") {
-                statusText = "Returned";
-                statusClass = "returned";
-            } else if (item.type === "Lost") {
-                statusText = "Lost";
-                statusClass = "lost";
-            }
-
-            row.innerHTML = `
-                <td>${escapeHTML(item.name)}</td>
-                <td>${escapeHTML(item.type)}</td>
-                <td>${escapeHTML(item.campus)}</td>
-                <td>${escapeHTML(formatListingDate(item.date))}</td>
-                <td>
-                    <span class="status ${statusClass}" style="position:static">
-                        ${escapeHTML(statusText)}
-                    </span>
-                </td>
-                <td>
-                    <a class="back-link"
-                       href="item-details.html?id=${encodeURIComponent(item.id)}">
-                       View
-                    </a>
-                </td>
-            `;
-
-            myListingsBody.appendChild(row);
-        });
-    }
-
-    // ==========================================
-    // DISPLAY INCOMING CLAIM REQUESTS
-    // ==========================================
-
-    function renderClaimRequests() {
-        const myListings = getMyListings();
-        const myListingIds = myListings.map(function(item) {
-            return item.id;
-        });
-
-        const claims = getClaims().filter(function(claim) {
-            return myListingIds.includes(claim.listingId);
-        });
-
-        claimRequestsList.innerHTML = "";
-
-        if (claims.length === 0) {
-            claimRequestsList.innerHTML = `
-                <div class="panel" style="grid-column:1/-1;text-align:center">
-                    <h3>No claim requests yet</h3>
-                    <p class="subtitle">Incoming requests for your items will appear here.</p>
-                </div>
-            `;
-            return;
-        }
-
-        claims.slice().reverse().forEach(function(claim) {
-            const card = document.createElement("div");
-            card.className = "panel";
-
-            let statusColor = "var(--amber)";
-
-            if (claim.status === "Approved") {
-                statusColor = "var(--green)";
-            } else if (claim.status === "Rejected") {
-                statusColor = "var(--red)";
-            }
-
-            let actionButtons = "";
-
-            if (claim.status === "Pending") {
-                actionButtons = `
-                    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px">
-                        <button class="btn btn-primary approve-claim"
-                                data-id="${escapeHTML(claim.id)}">
-                            Approve
-                        </button>
-                        <button class="btn btn-outline reject-claim"
-                                data-id="${escapeHTML(claim.id)}">
-                            Reject
-                        </button>
+            if (claimRequestsList) {
+                claimRequestsList.innerHTML = `
+                    <div class="panel">
+                        <p class="subtitle">
+                            Log in to review your claim requests.
+                        </p>
                     </div>
                 `;
             }
 
-            card.innerHTML = `
-                <div class="eyebrow">Claim request</div>
-                <h3 style="margin:8px 0">${escapeHTML(claim.itemName)}</h3>
+            return;
+        }
 
-                <p class="subtitle">
-                    <strong>Claimant:</strong> ${escapeHTML(claim.claimantName)}
-                </p>
+        // GET MY LISTINGS
 
-                <p class="subtitle">
-                    <strong>Email:</strong> ${escapeHTML(claim.claimantEmail)}
-                </p>
+        async function getMyListings() {
+            const { data, error } = await db
+                .from("listings")
+                .select("*")
+                .eq("owner_id", currentUser.id)
+                .order("created_at", { ascending: false });
 
-                <p style="margin-top:12px">
-                    <strong>Explanation:</strong><br>
-                    ${escapeHTML(claim.reason)}
-                </p>
+            if (error) {
+                console.error("My listings error:", error);
+                return [];
+            }
 
-                <p style="margin-top:14px">
-                    <strong>Status:</strong>
-                    <span style="color:${statusColor};font-weight:700">
-                        ${escapeHTML(claim.status)}
-                    </span>
-                </p>
+            return data || [];
+        }
 
-                ${actionButtons}
-            `;
+        // RENDER MY LISTINGS
 
-            claimRequestsList.appendChild(card);
-        });
+        async function renderMyListings() {
+            const listings = await getMyListings();
 
-        // APPROVE CLAIM
-        document.querySelectorAll(".approve-claim").forEach(function(button) {
-            button.addEventListener("click", function() {
-                const confirmed = confirm(
-                    "Are you sure you want to approve this claim? Other pending claims for this item will be rejected."
-                );
+            const filteredListings = listings.filter(item => {
+                if (selectedFilter === "All") return true;
 
-                if (!confirmed) {
-                    return;
+                if (selectedFilter === "Claimed") {
+                    return item.status === "Claimed";
                 }
 
-                const claims = getClaims();
-                const selectedClaim = claims.find(function(claim) {
-                    return claim.id === button.dataset.id;
-                });
-
-                if (!selectedClaim || selectedClaim.status !== "Pending") {
-                    alert("This claim is no longer pending.");
-                    return;
+                if (selectedFilter === "Returned") {
+                    return item.status === "Returned";
                 }
 
-                const listings = getListings();
-                const selectedItem = listings.find(function(item) {
-                    return item.id === selectedClaim.listingId;
-                });
+                return item.type === selectedFilter;
+            });
 
-                if (!selectedItem || selectedItem.status === "Claimed" ||
-                    selectedItem.status === "Returned") {
-                    alert("This item is no longer available.");
-                    return;
+            myListingsBody.innerHTML = "";
+
+            if (filteredListings.length === 0) {
+                myListingsBody.innerHTML = `
+                    <tr>
+                        <td colspan="6" style="text-align:center;padding:25px">
+                            No listings found.
+                        </td>
+                    </tr>
+                `;
+
+                return;
+            }
+
+            filteredListings.forEach(item => {
+                const row = document.createElement("tr");
+
+                let statusText = item.status || "Available";
+                let statusClass = "available";
+
+                if (item.status === "Claimed") {
+                    statusClass = "claimed";
+                } else if (item.status === "Returned") {
+                    statusClass = "returned";
+                } else if (item.type === "Lost") {
+                    statusText = "Lost";
+                    statusClass = "lost";
                 }
 
-                if (getOwnerEmail(selectedItem) !== userEmail) {
-                    alert("You are not the owner of this listing.");
-                    return;
+                row.innerHTML = `
+                    <td>${escapeHTML(item.name)}</td>
+                    <td>${escapeHTML(item.type)}</td>
+                    <td>${escapeHTML(item.campus)}</td>
+                    <td>${escapeHTML(formatDate(item.item_date))}</td>
+                    <td>
+                        <span class="status ${statusClass}" style="position:static">
+                            ${escapeHTML(statusText)}
+                        </span>
+                    </td>
+                    <td>
+                        <a class="back-link"
+                           href="item-details.html?id=${encodeURIComponent(item.id)}">
+                            View
+                        </a>
+                    </td>
+                `;
+
+                myListingsBody.appendChild(row);
+            });
+        }
+
+        // ==========================================
+        // DISPLAY INCOMING CLAIM REQUESTS
+        // ==========================================
+
+        async function renderClaimRequests() {
+            if (!claimRequestsList) return;
+
+            const listings = await getMyListings();
+
+            const listingIds = listings.map(item => item.id);
+
+            claimRequestsList.innerHTML = "";
+
+            if (listingIds.length === 0) {
+                claimRequestsList.innerHTML = `
+                    <div class="panel" style="grid-column:1/-1;text-align:center">
+                        <h3>No claim requests yet</h3>
+                        <p class="subtitle">
+                            Incoming requests for your items will appear here.
+                        </p>
+                    </div>
+                `;
+
+                return;
+            }
+
+            const { data: claims, error } = await db
+                .from("claims")
+                .select("*")
+                .in("listing_id", listingIds)
+                .order("created_at", { ascending: false });
+
+            if (error) {
+                console.error("Claim requests error:", error);
+
+                claimRequestsList.textContent =
+                    "Unable to load claim requests: " + error.message;
+
+                return;
+            }
+
+            if (!claims || claims.length === 0) {
+                claimRequestsList.innerHTML = `
+                    <div class="panel" style="grid-column:1/-1;text-align:center">
+                        <h3>No claim requests yet</h3>
+                        <p class="subtitle">
+                            Incoming requests for your items will appear here.
+                        </p>
+                    </div>
+                `;
+
+                return;
+            }
+
+            const listingMap = new Map(
+                listings.map(item => [item.id, item])
+            );
+
+            claims.forEach(claim => {
+                const item = listingMap.get(claim.listing_id);
+
+                const card = document.createElement("div");
+                card.className = "panel";
+
+                let statusColor = "var(--amber)";
+
+                if (claim.status === "Approved") {
+                    statusColor = "var(--green)";
+                } else if (claim.status === "Rejected") {
+                    statusColor = "var(--red)";
                 }
 
-                selectedClaim.status = "Approved";
-                selectedClaim.reviewedAt = new Date().toISOString();
+                let actionButtons = "";
 
-                // Reject other pending claims for this item
-                claims.forEach(function(claim) {
-                    if (claim.listingId === selectedItem.id &&
-                        claim.id !== selectedClaim.id &&
-                        claim.status === "Pending") {
-                        claim.status = "Rejected";
-                        claim.reviewedAt = new Date().toISOString();
+                if (claim.status === "Pending") {
+                    actionButtons = `
+                        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px">
+                            <button class="btn btn-primary approve-claim"
+                                    data-id="${escapeHTML(claim.id)}">
+                                Approve
+                            </button>
+
+                            <button class="btn btn-outline reject-claim"
+                                    data-id="${escapeHTML(claim.id)}">
+                                Reject
+                            </button>
+                        </div>
+                    `;
+                }
+
+                card.innerHTML = `
+                    <div class="eyebrow">Claim request</div>
+
+                    <h3 style="margin:8px 0">
+                        ${escapeHTML(item ? item.name : "Unknown item")}
+                    </h3>
+
+                    <p class="subtitle">
+                        <strong>Claimant:</strong>
+                        ${escapeHTML(claim.claimant_name)}
+                    </p>
+
+                    <p class="subtitle">
+                        <strong>Email:</strong>
+                        ${escapeHTML(claim.claimant_email)}
+                    </p>
+
+                    <p style="margin-top:12px">
+                        <strong>Explanation:</strong>
+                        ${escapeHTML(claim.reason)}
+                    </p>
+
+                    <p style="margin-top:14px">
+                        <strong>Status:</strong>
+                        <span style="color:${statusColor};font-weight:700">
+                            ${escapeHTML(claim.status)}
+                        </span>
+                    </p>
+
+                    ${actionButtons}
+                `;
+
+                claimRequestsList.appendChild(card);
+            });
+
+            // APPROVE CLAIM
+
+            claimRequestsList.querySelectorAll(".approve-claim").forEach(button => {
+                button.addEventListener("click", async () => {
+                    const confirmed = confirm(
+                        "Are you sure you want to approve this claim? Other pending claims for this item will be rejected."
+                    );
+
+                    if (!confirmed) return;
+
+                    button.disabled = true;
+
+                    const { error } = await db.rpc("review_claim", {
+                        p_claim_id: button.dataset.id,
+                        p_decision: "Approved"
+                    });
+
+                    if (error) {
+                        console.error("Approve claim error:", error);
+                        alert("Unable to approve claim: " + error.message);
+                        button.disabled = false;
+                        return;
                     }
+
+                    alert("Claim approved successfully!");
+
+                    await renderMyListings();
+                    await renderClaimRequests();
+                });
+            });
+
+            // REJECT CLAIM
+
+            claimRequestsList.querySelectorAll(".reject-claim").forEach(button => {
+                button.addEventListener("click", async () => {
+                    const confirmed = confirm(
+                        "Are you sure you want to reject this claim?"
+                    );
+
+                    if (!confirmed) return;
+
+                    button.disabled = true;
+
+                    const { error } = await db.rpc("review_claim", {
+                        p_claim_id: button.dataset.id,
+                        p_decision: "Rejected"
+                    });
+
+                    if (error) {
+                        console.error("Reject claim error:", error);
+                        alert("Unable to reject claim: " + error.message);
+                        button.disabled = false;
+                        return;
+                    }
+
+                    alert("Claim rejected.");
+
+                    await renderClaimRequests();
+                });
+            });
+        }
+
+        // ==========================================
+        // FILTER BUTTONS
+        // ==========================================
+
+        filterButtons.forEach(button => {
+            button.addEventListener("click", async () => {
+                filterButtons.forEach(otherButton => {
+                    otherButton.classList.remove("active");
                 });
 
-                selectedItem.status = "Claimed";
+                button.classList.add("active");
+                selectedFilter = button.dataset.filter;
 
-                saveClaims(claims);
-                saveListings(listings);
-
-                alert("Claim approved successfully!");
-                renderMyListings();
-                renderClaimRequests();
+                await renderMyListings();
             });
         });
 
-        // REJECT CLAIM
-        document.querySelectorAll(".reject-claim").forEach(function(button) {
-            button.addEventListener("click", function() {
-                const confirmed = confirm("Are you sure you want to reject this claim?");
+        // INITIAL LOAD
 
-                if (!confirmed) {
-                    return;
-                }
-
-                const claims = getClaims();
-
-                const selectedClaim = claims.find(function(claim) {
-                    return claim.id === button.dataset.id;
-                });
-
-                if (!selectedClaim || selectedClaim.status !== "Pending") {
-                    alert("This claim is no longer pending.");
-                    return;
-                }
-
-                if (selectedClaim.ownerEmail !== userEmail) {
-                    alert("You are not authorized to review this claim.");
-                    return;
-                }
-
-                selectedClaim.status = "Rejected";
-                selectedClaim.reviewedAt = new Date().toISOString();
-
-                saveClaims(claims);
-
-                alert("Claim rejected.");
-                renderClaimRequests();
-            });
-        });
+        await renderMyListings();
+        await renderClaimRequests();
     }
 
     // ==========================================
-    // FILTER BUTTONS
+    // INITIALIZE PAGES
     // ==========================================
 
-    filterButtons.forEach(function(button) {
-        button.addEventListener("click", function() {
-            filterButtons.forEach(function(otherButton) {
-                otherButton.classList.remove("active");
-            });
+    document.addEventListener("DOMContentLoaded", async () => {
+        if (!db) {
+            console.error("Supabase client was not initialized.");
+            return;
+        }
 
-            button.classList.add("active");
-            selectedFilter = button.dataset.filter;
-
-            renderMyListings();
-        });
+        await initItemDetails();
+        await initMyListings();
     });
-
-    if (!userEmail) {
-        myListingsBody.innerHTML = `
-            <tr>
-                <td colspan="6" style="text-align:center;padding:25px">
-                    No logged-in user found. Log in to see your listings.
-                </td>
-            </tr>
-        `;
-
-        claimRequestsList.innerHTML = `
-            <div class="panel">
-                <p class="subtitle">Log in to review your claim requests.</p>
-            </div>
-        `;
-    } else {
-        renderMyListings();
-        renderClaimRequests();
-    }
-}
+})();

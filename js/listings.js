@@ -133,27 +133,20 @@ if (reportForm) {
     const reportMessage = document.getElementById("reportMessage");
 
     async function loadReportUser() {
-        const { data, error } = await listingSupabase.auth.getUser();
+    const { data, error } = await listingSupabase.auth.getUser();
 
-        if (error || !data.user) {
-            window.location.href = "index.html";
-            return;
-        }
-
-        const { data: profile } = await listingSupabase
-            .from("profiles")
-            .select("first_name, last_name")
-            .eq("id", data.user.id)
-            .single();
-
-        document.getElementById("contactEmail").value =
-            data.user.email || "";
-
-        return {
-            user: data.user,
-            profile: profile
-        };
+    if (error || !data.user) {
+        window.location.href = "index.html";
+        return;
     }
+
+    document.getElementById("contactEmail").value =
+        data.user.email || "";
+
+    return {
+        user: data.user
+    };
+}
 
     // Check login before allowing reports.
     loadReportUser();
@@ -222,17 +215,6 @@ if (reportForm) {
 
             const user = authData.user;
 
-            // GET USER PROFILE
-            const { data: profile, error: profileError } =
-                await listingSupabase
-                    .from("profiles")
-                    .select("first_name, last_name")
-                    .eq("id", user.id)
-                    .single();
-
-            if (profileError) {
-                throw profileError;
-            }
 
             // PROCESS PHOTOS
             const photos = [];
